@@ -1,0 +1,24 @@
+{
+  "name": "atas-registro-precos",
+  "version": "1.0.0",
+  "description": "Sistema de Gerenciamento de Atas de Registro de Precos",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev:all",
+    "dev:all": "npm run dev:backend & npm run dev:frontend",
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:backend": "cd backend && dotnet watch run",
+    "build": "npm run build -w frontend",
+    "lint": "npm run lint -w frontend"
+  },
+  "keywords": [
+    "atas",
+    "registro-precos",
+    "licitacao"
+  ],
+  "author": "",
+  "license": "ISC"
+}

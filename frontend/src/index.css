@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* Cores da Prefeitura do Rio / Secretaria de Saúde */
+:root {
+  --cor-primaria: #00508C;
+  --cor-secundaria: #0072BC;
+  --cor-destaque: #F7941D;
+  --cor-sucesso: #28a745;
+  --cor-alerta: #ffc107;
+  --cor-perigo: #dc3545;
+  --cor-critico: #7b1fa2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+/* Status badges */
+.status-vigente { background-color: #28a745; color: white; }
+.status-atencao { background-color: #17a2b8; color: white; }
+.status-alerta { background-color: #ffc107; color: #333; }
+.status-critico { background-color: #dc3545; color: white; }
+.status-vencida { background-color: #6c757d; color: white; }
+
+/* Mobile-first responsive utilities */
+@media (max-width: 640px) {
+  .mobile-full {
+    width: 100%;
+  }
+}

@@ -61,21 +61,62 @@ npm install
 
 ### 3. Configure o banco de dados
 
-O projeto utiliza .NET User Secrets para armazenar credenciais de forma segura.
+O projeto utiliza [.NET User Secrets](https://learn.microsoft.com/pt-br/aspnet/core/security/app-secrets) para armazenar credenciais de forma segura, evitando que informacoes sensiveis sejam commitadas no repositorio.
+
+#### Configurar via linha de comando
 
 ```bash
 cd backend
 
-# Inicializar User Secrets (se ainda nao foi inicializado)
-dotnet user-secrets init
-
 # Configurar a string de conexao
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=SEU_HOST;Port=5432;Database=siga;Username=SEU_USUARIO;Password=SUA_SENHA"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=SEU_HOST;Port=5432;Database=SEU_DATABASE;Username=SEU_USUARIO;Password=SUA_SENHA"
 
 cd ..
 ```
 
-> **Nota**: Os secrets sao armazenados localmente em `%APPDATA%\Microsoft\UserSecrets\atas-registro-precos-sms\secrets.json` e nao sao commitados no repositorio.
+#### Estrutura da Connection String
+
+| Parametro | Descricao                    | Exemplo                |
+|-----------|------------------------------|------------------------|
+| Host      | Endereco do servidor         | localhost              |
+| Port      | Porta do PostgreSQL          | 5432                   |
+| Database  | Nome do banco de dados       | siga                   |
+| Username  | Usuario do banco             | postgres               |
+| Password  | Senha do usuario             | minhasenha123          |
+
+#### Comandos uteis do User Secrets
+
+```bash
+cd backend
+
+# Listar todos os secrets configurados
+dotnet user-secrets list
+
+# Remover um secret especifico
+dotnet user-secrets remove "ConnectionStrings:DefaultConnection"
+
+# Limpar todos os secrets
+dotnet user-secrets clear
+
+cd ..
+```
+
+#### Onde os secrets sao armazenados
+
+Os secrets ficam armazenados localmente e **nunca sao commitados** no repositorio:
+
+| Sistema Operacional | Caminho                                                                      |
+|---------------------|------------------------------------------------------------------------------|
+| Windows             | `%APPDATA%\Microsoft\UserSecrets\atas-registro-precos-sms\secrets.json`      |
+| Linux/macOS         | `~/.microsoft/usersecrets/atas-registro-precos-sms/secrets.json`             |
+
+**Estrutura do arquivo `secrets.json`:**
+
+```json
+{
+  "ConnectionStrings:DefaultConnection": "Host=...;Port=5432;Database=...;Username=...;Password=..."
+}
+```
 
 ### 4. Execute as migrations (se necessario)
 

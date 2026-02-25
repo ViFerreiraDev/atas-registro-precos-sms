@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { atasApi } from '../services/api';
 import { SearchInput } from '../components/SearchInput';
 import { AtaCard } from '../components/AtaCard';
@@ -7,10 +8,12 @@ import { EmptyState } from '../components/EmptyState';
 import type { AtaResumo } from '../types';
 
 export function Atas() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [atas, setAtas] = useState<AtaResumo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [searchMode, setSearchMode] = useState(false);
+  const [searchMode, setSearchMode] = useState(() => !!searchParams.get('q'));
+  const initialQuery = searchParams.get('q') || '';
 
   const loadAtas = async () => {
     try {
@@ -29,12 +32,14 @@ export function Atas() {
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query) {
+      setSearchParams({}, { replace: true });
       loadAtas();
       return;
     }
     try {
       setLoading(true);
       setError(false);
+      setSearchParams({ q: query }, { replace: true });
       const data = await atasApi.pesquisar(query);
       setAtas(data);
       setSearchMode(true);
@@ -44,10 +49,14 @@ export function Atas() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setSearchParams]);
 
   useEffect(() => {
-    loadAtas();
+    if (initialQuery) {
+      handleSearch(initialQuery);
+    } else {
+      loadAtas();
+    }
   }, []);
 
   return (
@@ -62,6 +71,7 @@ export function Atas() {
         onSearch={handleSearch}
         loading={loading}
         minLength={1}
+        initialValue={initialQuery}
       />
 
       {loading ? (

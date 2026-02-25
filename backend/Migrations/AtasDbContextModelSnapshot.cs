@@ -4,7 +4,6 @@ using AtasApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,44 +15,38 @@ namespace AtasApi.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("AtasApi.Models.AtaItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<int>("AtaId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("ata_id");
 
                     b.Property<string>("ClassificacaoFornecedor")
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("classificacao_fornecedor");
 
                     b.Property<int>("CodigoItem")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("codigo_item");
 
                     b.Property<DateTime?>("DataHoraExclusao")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_hora_exclusao");
 
                     b.Property<string>("DescricaoItemOriginal")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("descricao_item_original");
 
                     b.Property<bool>("ItemExcluido")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("item_excluido");
 
                     b.Property<decimal?>("MaximoAdesao")
@@ -62,17 +55,17 @@ namespace AtasApi.Migrations
 
                     b.Property<string>("NiFornecedor")
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("ni_fornecedor");
 
                     b.Property<string>("NomeRazaoSocialFornecedor")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("nome_razao_social_fornecedor");
 
                     b.Property<string>("NumeroItem")
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("numero_item");
 
                     b.Property<decimal?>("PercentualMaiorDesconto")
@@ -93,7 +86,7 @@ namespace AtasApi.Migrations
 
                     b.Property<string>("SituacaoSicaf")
                         .HasMaxLength(5)
-                        .HasColumnType("character varying(5)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("situacao_sicaf");
 
                     b.Property<decimal?>("ValorTotal")
@@ -118,81 +111,79 @@ namespace AtasApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AnoCompra")
                         .HasMaxLength(4)
-                        .HasColumnType("character varying(4)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("ano_compra");
 
                     b.Property<string>("CodigoModalidadeCompra")
                         .HasMaxLength(5)
-                        .HasColumnType("character varying(5)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("codigo_modalidade_compra");
 
                     b.Property<string>("CodigoUnidadeGerenciadora")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("codigo_unidade_gerenciadora");
 
                     b.Property<DateTime?>("DataAssinatura")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_assinatura");
 
                     b.Property<DateTime?>("DataHoraAtualizacao")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_hora_atualizacao");
 
                     b.Property<DateTime?>("DataHoraInclusao")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_hora_inclusao");
 
                     b.Property<DateTime>("DataVigenciaFinal")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_vigencia_final");
 
                     b.Property<DateTime>("DataVigenciaInicial")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_vigencia_inicial");
 
                     b.Property<string>("IdCompra")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("id_compra");
 
                     b.Property<string>("NomeModalidadeCompra")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("nome_modalidade_compra");
 
                     b.Property<string>("NomeUnidadeGerenciadora")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("nome_unidade_gerenciadora");
 
                     b.Property<string>("NumeroAta")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("numero_ata");
 
                     b.Property<string>("NumeroCompra")
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("numero_compra");
 
                     b.Property<string>("NumeroControlePncpAta")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("numero_controle_pncp_ata");
 
                     b.Property<string>("NumeroControlePncpCompra")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("numero_controle_pncp_compra");
 
                     b.HasKey("Id");
@@ -212,30 +203,28 @@ namespace AtasApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Chave")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("chave");
 
                     b.Property<DateTime>("DataAtualizacao")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_atualizacao");
 
                     b.Property<string>("Descricao")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("descricao");
 
                     b.Property<string>("Valor")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("valor");
 
                     b.HasKey("Id");
@@ -250,32 +239,30 @@ namespace AtasApi.Migrations
                 {
                     b.Property<int>("CodigoItem")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("codigo_item");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CodigoItem"));
-
                     b.Property<int?>("CodigoPdm")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("codigo_pdm");
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_criacao");
 
                     b.Property<string>("DescricaoPrincipal")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("descricao_principal");
 
                     b.Property<string>("NomePdm")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("nome_pdm");
 
                     b.Property<string>("TipoItem")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("tipo_item");
 
                     b.HasKey("CodigoItem");
@@ -287,22 +274,20 @@ namespace AtasApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<int>("CodigoItem")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("codigo_item");
 
                     b.Property<DateTime>("DataRegistro")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_registro");
 
                     b.Property<string>("DescricaoItem")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("descricao_item");
 
                     b.HasKey("Id");
@@ -317,43 +302,41 @@ namespace AtasApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_criacao");
 
                     b.Property<DateTime?>("DataUltimaTentativa")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data_ultima_tentativa");
 
                     b.Property<string>("ErroMensagem")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("erro_mensagem");
 
                     b.Property<int>("ItensProcessados")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("itens_processados");
 
                     b.Property<int>("Pagina")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("pagina");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("status");
 
                     b.Property<int>("Tentativas")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("tentativas");
 
                     b.Property<int>("TotalPaginas")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("total_paginas");
 
                     b.HasKey("Id");

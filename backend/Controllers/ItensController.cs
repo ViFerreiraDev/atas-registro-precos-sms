@@ -169,24 +169,21 @@ public class ItensController : ControllerBase
         var hoje = DateTime.Today;
 
         var itensSemAta = await _db.Itens
+            .Include(i => i.AtaItens)
+                .ThenInclude(ai => ai.Ata)
             .Where(i => i.AtaItens.Any() && !i.AtaItens.Any(ai => ai.Ata.DataVigenciaFinal >= hoje))
-            .Select(i => new
-            {
+            .ToListAsync();
+
+        var resultado = itensSemAta
+            .Select(i => new ItemSemAtaDto(
                 i.CodigoItem,
                 i.TipoItem,
                 i.DescricaoPrincipal,
-                UltimaAtaVencida = i.AtaItens.Max(ai => ai.Ata.DataVigenciaFinal)
-            })
+                i.AtaItens.Max(ai => ai.Ata.DataVigenciaFinal)
+            ))
             .OrderByDescending(i => i.UltimaAtaVencida)
             .Take(limite)
-            .ToListAsync();
-
-        var resultado = itensSemAta.Select(i => new ItemSemAtaDto(
-            i.CodigoItem,
-            i.TipoItem,
-            i.DescricaoPrincipal,
-            i.UltimaAtaVencida
-        )).ToList();
+            .ToList();
 
         return Ok(resultado);
     }

@@ -19,7 +19,7 @@ const tabs: { id: Tab; label: string; icon: typeof AlertTriangle }[] = [
 ];
 
 export function Alertas() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialTab = (searchParams.get('tab') as Tab) ||
     (searchParams.get('status')?.toLowerCase() as Tab) || 'criticas';
@@ -60,6 +60,10 @@ export function Alertas() {
   useEffect(() => {
     loadData();
   }, [activeTab]);
+
+  useEffect(() => {
+    setSearchParams({ tab: activeTab }, { replace: true });
+  }, [activeTab, setSearchParams]);
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '-';
@@ -156,7 +160,7 @@ export function Alertas() {
       ) : (
         <div className="space-y-3">
           {atas.map((ata) => (
-            <AtaCard key={ata.id} ata={ata} />
+            <AtaCard key={ata.id} ata={ata} showItensPreview />
           ))}
         </div>
       )}

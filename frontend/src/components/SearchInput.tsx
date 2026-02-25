@@ -7,6 +7,7 @@ interface SearchInputProps {
   loading?: boolean;
   minLength?: number;
   autoFocus?: boolean;
+  initialValue?: string;
 }
 
 export function SearchInput({
@@ -15,8 +16,9 @@ export function SearchInput({
   loading = false,
   minLength = 3,
   autoFocus = false,
+  initialValue = '',
 }: SearchInputProps) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(initialValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto focus

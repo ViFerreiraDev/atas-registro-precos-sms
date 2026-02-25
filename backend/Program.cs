@@ -2,14 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using AtasApi.Data;
 using AtasApi.Services;
 
-// Configurar Npgsql para usar timestamp sem timezone
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Database
 builder.Services.AddDbContext<AtasDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Services
 builder.Services.AddHttpClient("SincronizacaoClient", client =>
@@ -46,7 +43,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
+app.UseStaticFiles();
 app.MapControllers();
+
+// SPA fallback: rotas que não são API servem o index.html
+app.MapFallbackToFile("index.html");
 
 // Auto migrate database
 using (var scope = app.Services.CreateScope())

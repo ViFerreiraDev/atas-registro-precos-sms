@@ -7,17 +7,14 @@ public class ApiResponse
     [JsonPropertyName("resultado")]
     public List<ApiArpItem> Resultado { get; set; } = new();
 
-    [JsonPropertyName("paginaAtual")]
-    public int PaginaAtual { get; set; }
+    [JsonPropertyName("totalRegistros")]
+    public int TotalRegistros { get; set; }
 
     [JsonPropertyName("totalPaginas")]
     public int TotalPaginas { get; set; }
 
-    [JsonPropertyName("itensPorPagina")]
-    public int ItensPorPagina { get; set; }
-
-    [JsonPropertyName("totalItens")]
-    public int TotalItens { get; set; }
+    [JsonPropertyName("paginasRestantes")]
+    public int PaginasRestantes { get; set; }
 }
 
 public class ApiArpItem

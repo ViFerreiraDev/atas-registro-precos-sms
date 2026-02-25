@@ -16,6 +16,40 @@ public class AtasController : ControllerBase
         _db = db;
     }
 
+    private static AtaResumoDto MapToResumo(AtaRegistroPreco a, DateTime hoje, bool incluirPreview = false)
+    {
+        var dias = (a.DataVigenciaFinal - hoje).Days;
+        var status = dias <= 0 ? "Vencida" :
+                     dias <= 30 ? "Critico" :
+                     dias <= 60 ? "Alerta" :
+                     dias <= 120 ? "Atencao" : "Vigente";
+
+        List<ItemPreviewDto>? preview = null;
+        if (incluirPreview && a.Itens != null)
+        {
+            preview = a.Itens.Take(3).Select(i => new ItemPreviewDto(
+                i.CodigoItem,
+                i.DescricaoItemOriginal,
+                i.Item?.TipoItem
+            )).ToList();
+        }
+
+        return new AtaResumoDto(
+            a.Id,
+            a.NumeroAta,
+            a.DataVigenciaFinal,
+            dias,
+            status,
+            null,
+            null,
+            null,
+            null,
+            a.Itens?.Count ?? 0,
+            a.Itens?.Sum(i => i.ValorTotal ?? 0) ?? 0,
+            preview
+        );
+    }
+
     /// <summary>
     /// Lista todas as atas vigentes
     /// </summary>
@@ -32,30 +66,25 @@ public class AtasController : ControllerBase
             .Where(a => a.DataVigenciaFinal >= hoje)
             .AsQueryable();
 
-        // Filtrar por faixa de dias ANTES de buscar
-        // Críticas (30d) = 0 a 30 dias
-        // Alerta (60d) = 31 a 60 dias
-        // Atenção (120d) = 61 a 120 dias
-        // Vigente = mais de 120 dias
         if (!string.IsNullOrEmpty(status))
         {
+            var em30 = hoje.AddDays(30);
+            var em60 = hoje.AddDays(60);
+            var em120 = hoje.AddDays(120);
+
             switch (status.ToLower())
             {
                 case "critico":
-                    // 0 a 30 dias
-                    query = query.Where(a => (a.DataVigenciaFinal - hoje).Days <= 30);
+                    query = query.Where(a => a.DataVigenciaFinal <= em30);
                     break;
                 case "alerta":
-                    // 31 a 60 dias
-                    query = query.Where(a => (a.DataVigenciaFinal - hoje).Days > 30 && (a.DataVigenciaFinal - hoje).Days <= 60);
+                    query = query.Where(a => a.DataVigenciaFinal > em30 && a.DataVigenciaFinal <= em60);
                     break;
                 case "atencao":
-                    // 61 a 120 dias
-                    query = query.Where(a => (a.DataVigenciaFinal - hoje).Days > 60 && (a.DataVigenciaFinal - hoje).Days <= 120);
+                    query = query.Where(a => a.DataVigenciaFinal > em60 && a.DataVigenciaFinal <= em120);
                     break;
                 case "vigente":
-                    // mais de 120 dias
-                    query = query.Where(a => (a.DataVigenciaFinal - hoje).Days > 120);
+                    query = query.Where(a => a.DataVigenciaFinal > em120);
                     break;
             }
         }
@@ -63,30 +92,11 @@ public class AtasController : ControllerBase
         var atas = await query
             .OrderBy(a => a.DataVigenciaFinal)
             .Take(limite)
-            .Select(a => new AtaResumoDto(
-                a.Id,
-                a.NumeroAta,
-                a.DataVigenciaFinal,
-                (a.DataVigenciaFinal - hoje).Days,
-                (a.DataVigenciaFinal - hoje).Days <= 0 ? "Vencida" :
-                (a.DataVigenciaFinal - hoje).Days <= 30 ? "Critico" :
-                (a.DataVigenciaFinal - hoje).Days <= 60 ? "Alerta" :
-                (a.DataVigenciaFinal - hoje).Days <= 120 ? "Atencao" : "Vigente",
-                null,
-                null,
-                null,
-                null,
-                a.Itens.Count,
-                a.Itens.Sum(i => i.ValorTotal ?? 0),
-                a.Itens.Take(3).Select(i => new ItemPreviewDto(
-                    i.CodigoItem,
-                    i.DescricaoItemOriginal,
-                    i.Item.TipoItem
-                )).ToList()
-            ))
             .ToListAsync();
 
-        return Ok(atas);
+        var resultado = atas.Select(a => MapToResumo(a, hoje, incluirPreview: true)).ToList();
+
+        return Ok(resultado);
     }
 
     /// <summary>
@@ -99,25 +109,15 @@ public class AtasController : ControllerBase
         var dataLimite = hoje.AddDays(-dias);
 
         var atas = await _db.Atas
+            .Include(a => a.Itens)
+                .ThenInclude(ai => ai.Item)
             .Where(a => a.DataVigenciaFinal < hoje && a.DataVigenciaFinal >= dataLimite)
             .OrderByDescending(a => a.DataVigenciaFinal)
-            .Select(a => new AtaResumoDto(
-                a.Id,
-                a.NumeroAta,
-                a.DataVigenciaFinal,
-                (a.DataVigenciaFinal - hoje).Days,
-                "Vencida",
-                null,
-                null,
-                null,
-                null,
-                a.Itens.Count,
-                a.Itens.Sum(i => i.ValorTotal ?? 0),
-                null
-            ))
             .ToListAsync();
 
-        return Ok(atas);
+        var resultado = atas.Select(a => MapToResumo(a, hoje, incluirPreview: true)).ToList();
+
+        return Ok(resultado);
     }
 
     /// <summary>
@@ -134,30 +134,11 @@ public class AtasController : ControllerBase
                 .ThenInclude(ai => ai.Item)
             .Where(a => a.DataVigenciaInicial >= dataLimite)
             .OrderByDescending(a => a.DataVigenciaInicial)
-            .Select(a => new AtaResumoDto(
-                a.Id,
-                a.NumeroAta,
-                a.DataVigenciaFinal,
-                (a.DataVigenciaFinal - hoje).Days,
-                (a.DataVigenciaFinal - hoje).Days <= 0 ? "Vencida" :
-                (a.DataVigenciaFinal - hoje).Days <= 30 ? "Critico" :
-                (a.DataVigenciaFinal - hoje).Days <= 60 ? "Alerta" :
-                (a.DataVigenciaFinal - hoje).Days <= 120 ? "Atencao" : "Vigente",
-                null,
-                null,
-                null,
-                null,
-                a.Itens.Count,
-                a.Itens.Sum(i => i.ValorTotal ?? 0),
-                a.Itens.Take(3).Select(i => new ItemPreviewDto(
-                    i.CodigoItem,
-                    i.DescricaoItemOriginal,
-                    i.Item.TipoItem
-                )).ToList()
-            ))
             .ToListAsync();
 
-        return Ok(atas);
+        var resultado = atas.Select(a => MapToResumo(a, hoje, incluirPreview: true)).ToList();
+
+        return Ok(resultado);
     }
 
     /// <summary>
@@ -219,29 +200,10 @@ public class AtasController : ControllerBase
                                          i.NomeRazaoSocialFornecedor.ToUpper().Contains(termoBusca)))
             .OrderByDescending(a => a.DataVigenciaFinal)
             .Take(50)
-            .Select(a => new AtaResumoDto(
-                a.Id,
-                a.NumeroAta,
-                a.DataVigenciaFinal,
-                (a.DataVigenciaFinal - hoje).Days,
-                (a.DataVigenciaFinal - hoje).Days <= 0 ? "Vencida" :
-                (a.DataVigenciaFinal - hoje).Days <= 30 ? "Critico" :
-                (a.DataVigenciaFinal - hoje).Days <= 60 ? "Alerta" :
-                (a.DataVigenciaFinal - hoje).Days <= 120 ? "Atencao" : "Vigente",
-                null,
-                null,
-                null,
-                null,
-                a.Itens.Count,
-                a.Itens.Sum(i => i.ValorTotal ?? 0),
-                a.Itens.Take(3).Select(i => new ItemPreviewDto(
-                    i.CodigoItem,
-                    i.DescricaoItemOriginal,
-                    i.Item.TipoItem
-                )).ToList()
-            ))
             .ToListAsync();
 
-        return Ok(atas);
+        var resultado = atas.Select(a => MapToResumo(a, hoje, incluirPreview: true)).ToList();
+
+        return Ok(resultado);
     }
 }

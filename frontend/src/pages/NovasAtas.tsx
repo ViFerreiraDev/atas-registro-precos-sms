@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Sparkles, Calendar } from 'lucide-react';
 import { atasApi } from '../services/api';
 import { AtaCard } from '../components/AtaCard';
@@ -17,10 +17,14 @@ const PERIODO_OPTIONS = [
 
 export function NovasAtas() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [atas, setAtas] = useState<AtaResumo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [periodo, setPeriodo] = useState(30);
+  const [periodo, setPeriodo] = useState(() => {
+    const p = searchParams.get('periodo');
+    return p ? parseInt(p) : 30;
+  });
 
   const loadAtas = async () => {
     try {
@@ -39,6 +43,10 @@ export function NovasAtas() {
   useEffect(() => {
     loadAtas();
   }, [periodo]);
+
+  useEffect(() => {
+    setSearchParams({ periodo: String(periodo) }, { replace: true });
+  }, [periodo, setSearchParams]);
 
   return (
     <div className="p-4 max-w-4xl mx-auto space-y-6">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Filter, X, ExternalLink, Package } from 'lucide-react';
 import { itensApi } from '../services/api';
 import { Card, CardHeader, CardContent } from '../components/Card';
@@ -32,18 +32,39 @@ const STATUS_LABELS: Record<string, string> = {
   Vigente: 'OK',
 };
 
+function filtrosFromParams(params: URLSearchParams): FiltrosItem {
+  return {
+    tipoItem: 'Material',
+    todos: params.get('todos') === '1',
+    status: params.get('status') || undefined,
+    busca: params.get('busca') || undefined,
+    diasMin: params.get('diasMin') ? parseInt(params.get('diasMin')!) : undefined,
+    diasMax: params.get('diasMax') ? parseInt(params.get('diasMax')!) : undefined,
+  };
+}
+
+function filtrosToParams(filtros: FiltrosItem): Record<string, string> {
+  const p: Record<string, string> = {};
+  if (filtros.status) p.status = filtros.status;
+  if (filtros.busca) p.busca = filtros.busca;
+  if (filtros.todos) p.todos = '1';
+  if (filtros.diasMin !== undefined) p.diasMin = String(filtros.diasMin);
+  if (filtros.diasMax !== undefined) p.diasMax = String(filtros.diasMax);
+  return p;
+}
+
 export function Materiais() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [itens, setItens] = useState<ItemAlerta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  // Padrão: não mostrar todos (começa dos críticos)
-  const [filtros, setFiltros] = useState<FiltrosItem>({
-    todos: false,
-    tipoItem: 'Material' // Fixo para materiais
+  const [filtros, setFiltros] = useState<FiltrosItem>(() => filtrosFromParams(searchParams));
+  const [buscaInput, setBuscaInput] = useState(searchParams.get('busca') || '');
+  const [mostrarFiltros, setMostrarFiltros] = useState(() => {
+    const p = searchParams;
+    return !!(p.get('status') || p.get('diasMin') || p.get('diasMax') || p.get('todos'));
   });
-  const [buscaInput, setBuscaInput] = useState('');
-  const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
   const carregarItens = useCallback(async () => {
     setLoading(true);
@@ -67,6 +88,11 @@ export function Materiais() {
     carregarItens();
   }, [carregarItens]);
 
+  // Sync filtros → URL params
+  useEffect(() => {
+    setSearchParams(filtrosToParams(filtros), { replace: true });
+  }, [filtros, setSearchParams]);
+
   const handleBuscar = () => {
     if (buscaInput.length >= 3 || buscaInput.length === 0) {
       setFiltros(prev => ({ ...prev, busca: buscaInput || undefined }));
@@ -82,6 +108,7 @@ export function Materiais() {
   const limparFiltros = () => {
     setFiltros({ todos: false, tipoItem: 'Material' });
     setBuscaInput('');
+    setSearchParams({}, { replace: true });
   };
 
   const temFiltrosAtivos =

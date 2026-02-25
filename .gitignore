@@ -17,7 +17,6 @@ obj/
 *.userosscache
 *.suo
 *.cache
-*.db
 *.db-shm
 *.db-wal
 

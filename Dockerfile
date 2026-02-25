@@ -34,6 +34,9 @@ COPY --from=build-backend /app/publish ./
 # Copy frontend build to wwwroot
 COPY --from=build-frontend /app/frontend/dist ./wwwroot/
 
+# Copy SQLite database
+COPY backend/atas.db ./atas.db
+
 # Environment
 ENV ASPNETCORE_URLS=http://+:8889
 ENV ASPNETCORE_ENVIRONMENT=Production

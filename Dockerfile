@@ -40,6 +40,7 @@ COPY backend/atas.db ./atas.db
 # Environment
 ENV ASPNETCORE_URLS=http://+:8889
 ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ConnectionStrings__DefaultConnection="Data Source=atas.db"
 
 EXPOSE 8889
 
